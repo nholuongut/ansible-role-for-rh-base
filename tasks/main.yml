@@ -1,0 +1,22 @@
+# roles/rhbase/tasks/main.yml
+---
+
+- name: Load distro specific variables
+  include_vars: "{{ item }}"
+  with_first_found:
+    - "{{ ansible_distribution }}-{{ ansible_distribution_major_version }}.yml"
+    - "{{ ansible_distribution }}.yml"
+    - "{{ ansible_os_family }}-{{ ansible_distribution_major_version }}.yml"
+    - "{{ ansible_os_family }}.yml"
+    - "{{ ansible_distribution_file_variety }}-{{ ansible_distribution_major_version }}.yml"
+    - "{{ ansible_distribution_file_variety }}.yml"
+  tags: rhbase
+
+- include_tasks: install.yml   # Install repositories and packages
+- include_tasks: config.yml    # Configuration (/etc/)
+- include_tasks: services.yml  # Start/stop basic services
+- include_tasks: security.yml  # Security settings
+- include_tasks: users.yml     # Create users
+- include_tasks: admin.yml     # Admin user (a.o. SSH key)
+- include_tasks: auto-updates.yml  # Automatic updates
+  when: rhbase_automatic_updates
